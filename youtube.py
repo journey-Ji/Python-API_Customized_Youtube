@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*- 
 ##API를 이용하여 유튜브 사이트 정보 크롤링
+#내가 원하는 채널들의 동영상을
+#업로드된지 일주일 이내의 것으로
+#유튜브 재생목록을 만들어
+#내 계정에 저장한다.
+
+
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -112,7 +118,7 @@ for i in range(len(ids)):
     search_response.append(youtube.search().list(
             order = "date",
             part = "snippet",
-            maxResults = 1 ,#최대 검색 갯수,
+            maxResults = 10 ,#최대 검색 갯수, (일주일 이내의 기간이므로 최대 10개까지 만들어두면 충분할듯)
             publishedAfter = set_time_again, #지정된 시간 이후에 만든 리소스만 가져옴. 값은 RFC 3339 형식이 지정된 날짜-시간 값(1970-01-01T00:00:00Z)입니다.
             channelId = str(ids[i]) # 리스트에 저장된 id값을 하나씩 불러온다.
         
@@ -129,19 +135,19 @@ print('비디오의 고유번호들 : '+str(vidoeIds))
 
 
 
-
+'''
 ###################위의 과정들이 해결될때 까지 잠시 봉인
 
 ##플레이리스트 생성은 1번만 하면 되는 거고
 ##플레이리스트에 동영상 넣기는 for문 돌려서 videoId받아와서 넣어야지 ~
-'''
+
 #플레이리스트 생성 
 print('--------------------재생목록 생성하기 테스트 시작 ---------------------')
 playlists_insert_response = youtube.playlists().insert(
   part="snippet,status",
   body=dict(
     snippet=dict(
-      title=set_time[:19], # 플레이리스트 이름 지정
+      title=set_time[:19], # 플레이리스트 이름 지정, 재생목록 생성하는 날짜와 시각을 이름으로 설정
       description="A private playlist created with the YouTube API v3" # 내용
     ),
     status=dict(
@@ -157,7 +163,7 @@ print ("New playlist id: %s" % playlists_insert_response["id"])
 #유튜브의 재생목록에 리소스(동영상) 추가
 print('--------------------재생목록에 리소스 추가 테스트 시작---------------------')
 playlistitems_list_request = []
-for i in range(len(ids)):
+for i in range(len(vidoeIds)):
     playlistitems_list_request.append(youtube.playlistItems().insert(
         part="snippet",
             body={
@@ -175,6 +181,14 @@ for i in range(len(ids)):
 
 
 print('---------------------종료---------------------')
+
+
+
+
+
+
+
+
 """
 ids=[]
 ids.append('UCBkyj16n2snkRg1BAzpovXQ')
